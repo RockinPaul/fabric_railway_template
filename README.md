@@ -1,5 +1,7 @@
 # Fabric on Railway
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/fabric?referralCode=YqmMB-&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
 Self-host [Fabric](https://github.com/danielmiessler/fabric)'s REST API, with
 its library of reusable AI prompts (Fabric calls them patterns) bundled in.
 
