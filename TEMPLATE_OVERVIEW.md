@@ -106,11 +106,8 @@ glue: a Dockerfile, an entrypoint and one patch file. The Dockerfile clones a
 pinned upstream tag, asserts the tag's commit so a moved tag fails the build,
 applies the patch and compiles the binary. Bumping Fabric is a two-line change.
 
-The patch carries three small changes upstream has not taken: an
-unauthenticated `/health` route for the platform health check, the correct
-`text/event-stream` media type on the streaming chat endpoint, and a CORS
-origin read from `FABRIC_ALLOWED_ORIGIN` instead of being pinned to a local
-development server.
+The patch carries one small change upstream has not taken: an unauthenticated
+`/health` route for the platform health check.
 
 Patterns and strategies are baked into the image and copied into the volume on
 first boot, so a fresh deployment works without reaching out to GitHub. The
@@ -146,9 +143,10 @@ curl -H "X-API-Key: $FABRIC_API_KEY" https://YOUR-FABRIC-DOMAIN/models/names
 curl -H "X-API-Key: $FABRIC_API_KEY" https://YOUR-FABRIC-DOMAIN/patterns/names
 ```
 
-Set `FABRIC_ALLOWED_ORIGIN` if a browser application will read the streaming
-chat endpoint; it defaults to `*`, which is safe here because the API
-authenticates with a header rather than cookies.
+Set `FABRIC_CORS_ORIGINS` (comma-separated) to the origins of browser
+applications that call the API; it defaults to `*`, which is safe here because
+the API authenticates with a header rather than cookies. The older
+`FABRIC_ALLOWED_ORIGIN` still works when `FABRIC_CORS_ORIGINS` is unset.
 
 Swagger is available at:
 

@@ -15,7 +15,7 @@ publishes no container image.
 |---|---|
 | `Dockerfile` | Clones the pinned Fabric tag, applies the patch, builds the binary |
 | `entrypoint.sh` | Seeds the config volume, writes Railway variables into Fabric's `.env`, drops privileges |
-| `patches/` | Three small changes upstream has not taken yet |
+| `patches/` | One small change upstream has not taken yet |
 | `railway.json` | Healthcheck and restart policy, so they live with the code |
 | `TEMPLATE_OVERVIEW.md` | The marketplace description |
 
@@ -24,8 +24,8 @@ publishes no container image.
 Change two lines at the top of the `Dockerfile`:
 
 ```dockerfile
-ARG FABRIC_VERSION=v1.4.478
-ARG FABRIC_COMMIT=b682dad740f24e85ce9a48d23babc6780dd476ac
+ARG FABRIC_VERSION=v1.4.518
+ARG FABRIC_COMMIT=177b3a9d284895c907d6eb3a64937d174add4cd5
 ```
 
 Take the commit from `git ls-remote --tags https://github.com/danielmiessler/fabric.git`.
@@ -40,20 +40,15 @@ quietly:
 - **The Go toolchain may be too old.** Check upstream's `go.mod`; the
   `GO_IMAGE` argument selects the builder image.
 
-## The patch, and why each piece exists
+## The patch, and why it exists
 
 - **An unauthenticated `/health` route.** Railway's health check is a plain GET
   with no headers, and Fabric protects everything except its Swagger routes.
-- **`text/event-stream` on the streaming chat endpoint.** Upstream sends
-  `text/readystream`, which is not a real media type, while its own API
-  annotation says otherwise. Browser `EventSource` clients need the correct one.
-- **A configurable CORS origin.** Upstream pins the allowed origin to
-  `http://localhost:5173`, so no browser client on a deployed domain can read
-  the stream. It now comes from `FABRIC_ALLOWED_ORIGIN`, defaulting to `*`,
-  which is safe because the API authenticates with the `X-API-Key` header
-  rather than cookies.
 
-All three are worth sending upstream. If they land, this directory shrinks.
+It is worth sending upstream. Until v1.4.518 the patch also carried the
+`text/event-stream` media type for the streaming chat endpoint and a
+configurable CORS origin; upstream took both (v1.4.510 and v1.4.508), so they
+were dropped.
 
 ## Variables
 
@@ -63,7 +58,7 @@ All three are worth sending upstream. If they land, this directory shrinks.
 | Provider credential | yes in practice | One of `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY` and others, matching `DEFAULT_VENDOR`. Without one the server starts and answers health checks, but every completion fails, so the entrypoint warns loudly |
 | `DEFAULT_VENDOR` | no | Defaults to `OpenAI` |
 | `DEFAULT_MODEL` | no | Defaults to `gpt-4.1-mini` |
-| `FABRIC_ALLOWED_ORIGIN` | no | CORS origin for browser clients, defaults to `*` |
+| `FABRIC_CORS_ORIGINS` | no | Browser origins allowed to call the API, comma-separated, defaults to `*`. The older `FABRIC_ALLOWED_ORIGIN` is still read when this is unset. `*` is safe because the API authenticates with the `X-API-Key` header rather than cookies |
 
 The entrypoint passes roughly forty provider and helper variables through to
 Fabric's `.env` when they are set. See `entrypoint.sh` for the full list.

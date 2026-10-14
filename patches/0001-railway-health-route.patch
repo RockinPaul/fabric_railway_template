@@ -1,0 +1,52 @@
+diff --git a/internal/server/auth.go b/internal/server/auth.go
+index f3f92fa..98922b4 100644
+--- a/internal/server/auth.go
++++ b/internal/server/auth.go
+@@ -38,9 +38,10 @@ func APIKeyMiddleware(apiKey string) gin.HandlerFunc {
+ 	// Hash the configured key so the comparison avoids leaking its length through timing.
+ 	expectedKey := sha256.Sum256([]byte(apiKey))
+ 	return func(c *gin.Context) {
+-		// Skip authentication for Swagger documentation endpoints
++		// Skip authentication for Swagger documentation endpoints and for the
++		// liveness endpoint, which platform health checks call without headers.
+ 		// This allows public access to API docs even when authentication is enabled
+-		if strings.HasPrefix(c.Request.URL.Path, "/swagger/") {
++		if c.Request.URL.Path == "/health" || strings.HasPrefix(c.Request.URL.Path, "/swagger/") {
+ 			c.Next()
+ 			return
+ 		}
+diff --git a/internal/server/health.go b/internal/server/health.go
+new file mode 100644
+index 0000000..03cf2c6
+--- /dev/null
++++ b/internal/server/health.go
+@@ -0,0 +1,16 @@
++package restapi
++
++import (
++	"net/http"
++
++	"github.com/gin-gonic/gin"
++)
++
++// registerHealthRoute exposes an unauthenticated liveness endpoint. Platform
++// health checks are plain unauthenticated GETs, so this has to sit outside the
++// API-key middleware; it deliberately reports nothing but liveness.
++func registerHealthRoute(r *gin.Engine) {
++	r.GET("/health", func(c *gin.Context) {
++		c.JSON(http.StatusOK, gin.H{"status": "ok"})
++	})
++}
+diff --git a/internal/server/serve.go b/internal/server/serve.go
+index 886fa06..5a90c32 100644
+--- a/internal/server/serve.go
++++ b/internal/server/serve.go
+@@ -86,6 +86,8 @@ func newSecuredEngine(registry *core.PluginRegistry, apiKey string, corsOrigins
+ func newServeEngine(registry *core.PluginRegistry, apiKey string, corsOrigins []string) *gin.Engine {
+ 	r := newSecuredEngine(registry, apiKey, corsOrigins, i18n.T("server_no_api_key_warning"))
+ 
++	registerHealthRoute(r)
++
+ 	// Swagger UI and documentation endpoint with custom YAML handler
+ 	r.GET("/swagger/*any", func(c *gin.Context) {
+ 		if c.Param("any") == "/swagger.yaml" {

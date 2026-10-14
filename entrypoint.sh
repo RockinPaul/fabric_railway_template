@@ -126,6 +126,15 @@ fi
 
 chown -R appuser:appuser "$CONFIG_DIR"
 
+# Browser origins allowed to call the API. Upstream reads FABRIC_CORS_ORIGINS
+# (comma-separated, "*" for any) since v1.4.508; FABRIC_ALLOWED_ORIGIN is this
+# template's older name for a single origin and still works. "*" stays the
+# default because the API authenticates with the X-API-Key header, not cookies.
+export FABRIC_CORS_ORIGINS="${FABRIC_CORS_ORIGINS:-${FABRIC_ALLOWED_ORIGIN:-*}}"
+
 # ":$PORT" listens on the IPv6 wildcard as a dual-stack socket, which is what
 # Railway's private network needs and its public edge still reaches over IPv4.
-exec su-exec appuser /usr/local/bin/fabric --serve --address=":${PORT}" --api-key="${FABRIC_API_KEY}"
+# Fabric reads FABRIC_API_KEY from the environment; passing it as --api-key
+# would put the key in the process list, which Fabric warns about.
+export FABRIC_API_KEY
+exec su-exec appuser /usr/local/bin/fabric --serve --address=":${PORT}"

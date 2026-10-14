@@ -7,10 +7,10 @@
 # container image. Bumping Fabric is a two-line change: FABRIC_VERSION and
 # FABRIC_COMMIT below.
 
-ARG FABRIC_VERSION=v1.4.478
+ARG FABRIC_VERSION=v1.4.518
 # The tag's commit, asserted after the clone so a moved or re-pointed tag fails
 # the build instead of silently changing what ships.
-ARG FABRIC_COMMIT=b682dad740f24e85ce9a48d23babc6780dd476ac
+ARG FABRIC_COMMIT=177b3a9d284895c907d6eb3a64937d174add4cd5
 # Upstream's go.mod requires this toolchain; a bump may need a newer one.
 ARG GO_IMAGE=golang:1.26-alpine
 ARG ALPINE_VERSION=3.21
@@ -29,10 +29,11 @@ RUN git clone --depth 1 --branch "${FABRIC_VERSION}" https://github.com/danielmi
          echo "tag ${FABRIC_VERSION} is at ${actual}, expected ${FABRIC_COMMIT}" >&2; exit 1; \
        fi
 
-# Three small changes upstream has not taken yet: an unauthenticated /health
-# route for the platform health check, the correct SSE media type, and a CORS
-# origin that is not pinned to a local dev server. git apply fails the build if
-# upstream has moved, which is the signal to rebase or drop the patch.
+# One small change upstream has not taken: an unauthenticated /health route for
+# the platform health check. (Upstream took the other two this template used to
+# carry: the SSE media type in v1.4.510 and configurable CORS in v1.4.508.)
+# git apply fails the build if upstream has moved, which is the signal to rebase
+# or drop the patch.
 COPY patches/ /patches/
 RUN git -C src apply --verbose /patches/*.patch
 
