@@ -24,7 +24,7 @@ publishes no container image.
 Change two lines at the top of the `Dockerfile`:
 
 ```dockerfile
-ARG FABRIC_VERSION=v1.4.518
+ARG FABRIC_VERSION=v1.4.557
 ARG FABRIC_COMMIT=177b3a9d284895c907d6eb3a64937d174add4cd5
 ```
 

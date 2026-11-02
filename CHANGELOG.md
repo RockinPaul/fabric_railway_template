@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-11-02
+
+- **Fabric bumped from v1.4.518 to v1.4.557**, pinned by tag and asserted by
+  commit (`8ce0909d8622a61b6aaf539d467ba31bb7e0b6dd`). The `/health` patch
+  applies unchanged.
+- **Security fixes in this range:** the server locks out a client after
+  repeated wrong API keys, redacts the key in recovery dumps, masks secret
+  setting values, bounds provider error bodies, and makes existing session and
+  context files private.
+- **Plaintext `http` to a remote model host is refused** for the OpenAI,
+  Exolab and Codex plugins. A custom `OPENAI_API_BASE_URL` must be `https`;
+  upstream has an opt-in allowlist for private or LAN model servers.
+
+### Upgrading an existing deployment
+
+Nothing to change unless a provider base URL is plain `http` on a public host.
+
 ## 2026-10-14
 
 - **Fabric bumped from v1.4.478 to v1.4.518**, pinned by tag and asserted by
