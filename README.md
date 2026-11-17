@@ -24,8 +24,8 @@ publishes no container image.
 Change two lines at the top of the `Dockerfile`:
 
 ```dockerfile
-ARG FABRIC_VERSION=v1.4.557
-ARG FABRIC_COMMIT=8ce0909d8622a61b6aaf539d467ba31bb7e0b6dd
+ARG FABRIC_VERSION=v1.4.576
+ARG FABRIC_COMMIT=1d54525113c36a74fb62e56f5c68036130ca7782
 ```
 
 Take the commit from `git ls-remote --tags https://github.com/danielmiessler/fabric.git`.

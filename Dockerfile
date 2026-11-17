@@ -7,12 +7,12 @@
 # container image. Bumping Fabric is a two-line change: FABRIC_VERSION and
 # FABRIC_COMMIT below.
 
-ARG FABRIC_VERSION=v1.4.557
+ARG FABRIC_VERSION=v1.4.576
 # The tag's commit, asserted after the clone so a moved or re-pointed tag fails
 # the build instead of silently changing what ships.
-ARG FABRIC_COMMIT=8ce0909d8622a61b6aaf539d467ba31bb7e0b6dd
+ARG FABRIC_COMMIT=1d54525113c36a74fb62e56f5c68036130ca7782
 # Upstream's go.mod requires this toolchain; a bump may need a newer one.
-ARG GO_IMAGE=golang:1.26-alpine
+ARG GO_IMAGE=golang:1.26.10-alpine
 ARG ALPINE_VERSION=3.21
 
 FROM ${GO_IMAGE} AS builder
