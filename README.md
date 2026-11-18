@@ -16,7 +16,6 @@ publishes no container image.
 | `Dockerfile` | Clones the pinned Fabric tag, applies the patch, builds the binary |
 | `entrypoint.sh` | Seeds the config volume, writes Railway variables into Fabric's `.env`, drops privileges |
 | `patches/` | One small change upstream has not taken yet |
-| `railway.json` | Healthcheck and restart policy, so they live with the code |
 | `TEMPLATE_OVERVIEW.md` | The marketplace description |
 
 ## Bumping Fabric
